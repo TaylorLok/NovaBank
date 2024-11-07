@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum AccountTypes: string
 {
-    case SAVINGS = 'savings';
-    case CHECKING = 'checking';
-    case CREDIT = 'credit';
+    case SAVINGS = 'Savings';
+    case CHECKING = 'Check';
+    case CREDIT = 'Credit';
 }
