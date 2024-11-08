@@ -7,7 +7,7 @@ use App\Models\Account;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Carbon\CarbonPeriod;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Database\Seeders\AccountSeeder;
 use Database\Seeders\TransactionSeeder;
 
@@ -32,8 +32,6 @@ class AccountService implements AccountServiceInterface
             return Account::where('user_id', $userId)->findOrFail($accountId); 
         } 
         catch (ModelNotFoundException $e) {
-            // Catch and handle exception gracefully
-            // Log the error (optional) or return null or a fallback response
             \Log::error("Account not found for user $userId and account $accountId: " . $e->getMessage());
             return null; 
         }
@@ -45,7 +43,7 @@ class AccountService implements AccountServiceInterface
         $account = $this->getAccountForUser($userId, $accountId);
         
         if (!$account) {
-            return collect([]); // Return an empty collection if account does not exist
+            return collect([]); 
         }
 
         // Get initial balance before start date

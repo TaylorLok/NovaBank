@@ -19,12 +19,15 @@ class AccountController extends Controller
      */
     public function index()
     {
-        try {
+        try 
+        {
             $accounts = $this->accountService->getAllUserAccounts(auth()->id());
             return view('accounts.index', compact('accounts'));
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) {
+
             \Log::error('Error fetching accounts: ' . $e->getMessage());
-            return redirect()->route('home')->with('error', 'Unable to fetch accounts at this time.');
+            return redirect()->back()->with('error', 'Unable to fetch accounts at this time.');
         }
     }
 

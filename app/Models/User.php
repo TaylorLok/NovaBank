@@ -62,6 +62,6 @@ class User extends Authenticatable
      */
     public function transactions(): HasMany
     {
-        return $this->hasManyThrough(AccountTrasanction::class, Account::class);
+        return $this->hasManyThrough(AccountTransaction::class, Account::class);
     }
 }

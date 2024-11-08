@@ -31,16 +31,16 @@ interface AccountServiceInterface
      * @param int $accountId
      * @param string $startDate
      * @param string $endDate
-     * @return float
+     * @return Collection
      */
-    public function getDailyBalanceSummary(int $userId, int $accountId, string $startDate, string $endDate): float;
+    public function getDailyBalanceSummary(int $userId, int $accountId, string $startDate, string $endDate): Collection;
 
     /**
      * Generate accounts for a new user.
      *
      * @param int $userId
-     * @return \Illuminate\Database\Eloquent\Collection
+     * 
      */
-    public function generateAccountsForNewUser(int $userId): Collection;
+    public function generateAccountsForNewUser(int $userId): void;
 }
 

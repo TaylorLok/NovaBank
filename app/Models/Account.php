@@ -30,6 +30,6 @@ class Account extends Model
 
     public function transactions(): HasMany 
     {
-        return $this->hasMany(AccountTrasanction::class);
+        return $this->hasMany(AccountTransaction::class);
     }
 }

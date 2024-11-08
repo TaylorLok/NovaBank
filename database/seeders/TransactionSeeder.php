@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Account;
-use App\Models\AccountTrasanction;
+use App\Models\AccountTransaction;
 use App\Enums\TransactionTypes;
 use Carbon\Carbon;
 
@@ -14,6 +14,30 @@ class TransactionSeeder extends Seeder
     public function run(): void
     {
         $accounts = Account::all();
+        $this->seedTransactionsForAccounts($accounts);
+    }
+
+    /**
+     * Create transactions for a specific user's accounts.
+     *
+     * @param int $userId
+     * @return void
+     */
+    public function createForUser(int $userId): void
+    {
+        // Fetch accounts for the specified user
+        $accounts = Account::where('user_id', $userId)->get();
+        $this->seedTransactionsForAccounts($accounts);
+    }
+
+    /**
+     * Seed transactions for the given accounts.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection $accounts
+     * @return void
+     */
+    private function seedTransactionsForAccounts($accounts): void
+    {
         $transactionTypes = [TransactionTypes::DEBIT, TransactionTypes::CREDIT];
 
         foreach ($accounts as $account) {
@@ -46,7 +70,7 @@ class TransactionSeeder extends Seeder
                 }
 
                 // Save the transaction with balance after transaction
-                AccountTrasanction::create([
+                AccountTransaction::create([
                     'account_id' => $account->id,
                     'transaction_type' => $transactionType->value,
                     'amount' => $amount,
