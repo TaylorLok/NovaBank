@@ -25,14 +25,6 @@ class AccountControllerTest extends TestCase
         // Initialize AccountService instance
         $this->accountService = app(AccountService::class);
     }
-        
-        // Create a user and account for each test
-        // $this->user = User::factory()->create();
-        // $this->account = Account::factory()->create([
-        //     'user_id' => $this->user->id,
-        //     'account_type' => AccountTypes::SAVINGS,
-        //     'current_balance' => 1000.00
-        // ]);
     
 
     /**
