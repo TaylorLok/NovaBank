@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Carbon\Carbon;
 
 class DailyBalanceRequest extends FormRequest
 {
@@ -22,9 +23,26 @@ class DailyBalanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'start_date' => ['required', 'date', 'before_or_equal:end_date','date_format:Y-m-d'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date', 'date_format:Y-m-d'],
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        // Set default dates if not provided
+        $this->merge([
+            'start_date' => $this->start_date ?? now()->subMonth()->format('Y-m-d'),
+            'end_date' => $this->end_date ?? now()->format('Y-m-d'),
+        ]);
+    }
+
+    public function validated($key = null, $default = null)
+    {
+        if ($key) {
+            return parent::validated()[$key] ?? $default;
+        }
+        return parent::validated();
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace App\Interfaces;
 
 use App\Models\Account;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 interface AccountServiceInterface
 {
@@ -11,7 +11,7 @@ interface AccountServiceInterface
      * Get all accounts for a specific user.
      *
      * @param int $userId
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Suuport\Collection
      */
     public function getAllUserAccounts(int $userId): Collection;
 

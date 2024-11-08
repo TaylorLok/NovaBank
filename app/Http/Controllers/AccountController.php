@@ -7,6 +7,7 @@ use App\Http\Requests\DailyBalanceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AccountController extends Controller
 {
@@ -56,20 +57,65 @@ class AccountController extends Controller
     public function dailyBalance(DailyBalanceRequest $request, int $accountId)
     {
         try {
-            $summary = $this->accountService->getDailyBalanceSummary(auth()->id(), $accountId, $request->start_date, $request->end_date);
-
-            if ($request->wantsJson()) {
-                return response()->json($summary);
+            // Get account and verify ownership in one query
+            $account = $this->accountService->getAccountForUser(auth()->id(), $accountId);
+            
+            if (!$account) {
+                return $request->wantsJson()
+                    ? response()->json(['error' => 'Account not found'], 404)
+                    : redirect()->route('dashboard')->with('error', 'Account not found');
             }
-
+    
+            // Get validated dates with defaults
+            $startDate = $request->get('start_date', now()->subMonth()->format('Y-m-d'));
+            $endDate = $request->get('end_date', now()->format('Y-m-d'));
+    
+            // Fetch daily balance summary
+            $collection = $this->accountService->getDailyBalanceSummary(
+                auth()->id(),
+                $accountId,
+                $startDate,
+                $endDate
+            );
+    
+            // Efficient pagination
+            $page = $request->input('page', 1);
+            $perPage = 10;
+            $items = $collection->forPage($page, $perPage);
+            
+            $paginator = new LengthAwarePaginator(
+                $items,
+                $collection->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->except('page')]
+            );
+    
+            if ($request->wantsJson()) {
+                return response()->json($paginator);
+            }
+    
             return view('accounts.daily-balance', [
-                'summary' => $summary,
-                'account' => $this->accountService->getAccountForUser(auth()->id(), $accountId)
+                'account' => $account,
+                'summary' => $paginator 
             ]);
-        } 
-        catch (Exception $e) {
-            \Log::error('Error fetching daily balance summary: ' . $e->getMessage());
-            return redirect()->route('accounts.index')->with('error', 'Unable to fetch the daily balance summary at this time.');
+    
+        } catch (Exception $e) {
+            // Enhanced error logging
+            \Log::error('Daily balance error', [
+                'message' => $e->getMessage(),
+                'account_id' => $accountId,
+                'user_id' => auth()->id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $errorMessage = config('app.debug') 
+                ? $e->getMessage() 
+                : 'Failed to fetch daily balance data';
+    
+            return $request->wantsJson()
+                ? response()->json(['error' => $errorMessage], 500)
+                : redirect()->route('dashboard')->with('error', $errorMessage);
         }
     }
 }
